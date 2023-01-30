@@ -1,0 +1,16 @@
+FROM usbip:latest
+
+COPY usbip /usbip
+
+RUN apk add build-base autoconf \
+    automake libtool eudev-dev \
+    linux-headers flex bison gmp-dev \
+    mpc1-dev mpfr-dev hwdata
+
+WORKDIR /usbip
+
+RUN ./autogen.sh
+RUN ./configure
+RUN make install
+
+CMD ["usbip list -r usbip"]

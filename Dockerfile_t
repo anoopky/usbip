@@ -1,0 +1,22 @@
+FROM alpine:latest
+
+COPY . /linux
+
+RUN apk add build-base autoconf \
+    automake libtool eudev-dev \
+    linux-headers flex bison gmp-dev \
+    mpc1-dev mpfr-dev hwdata
+
+
+WORKDIR /linux
+
+#RUN zcat /proc/config.gz > .config
+RUN make olddefconfig
+RUN make modules_prepare
+RUN make M=drivers/usb/usbip modules
+
+WORKDIR /linux/tools/usb/usbip/
+
+RUN ./autogen.sh
+RUN ./configure
+RUN make install

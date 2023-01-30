@@ -1,0 +1,16 @@
+services:
+  service1:
+    networks:
+      test:
+    build:
+      dockerfile: Dockerfile
+
+  service2:
+    networks:
+      test:
+    build:
+      dockerfile: Dockerfile1
+
+networks:
+  test:
+    driver: bridge
