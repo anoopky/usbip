@@ -39,8 +39,8 @@ void usbip_attach_usage(void)
 static int record_connection(char *host, char *port, char *busid, int rhport)
 {
 	int fd;
-	char path[PATH_MAX+1];
-	char buff[MAX_BUFF+1];
+	char path[PATH_MAX + 1];
+	char buff[MAX_BUFF + 1];
 	int ret;
 
 	ret = mkdir(VHCI_STATE_PATH, 0700);
@@ -58,17 +58,16 @@ static int record_connection(char *host, char *port, char *busid, int rhport)
 			return -1;
 	}
 
-	snprintf(path, PATH_MAX, VHCI_STATE_PATH"/port%d", rhport);
+	snprintf(path, PATH_MAX, VHCI_STATE_PATH "/port%d", rhport);
 
-	fd = open(path, O_WRONLY|O_CREAT|O_TRUNC, S_IRWXU);
+	fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
 	if (fd < 0)
 		return -1;
 
-	snprintf(buff, MAX_BUFF, "%s %s %s\n",
-			host, port, busid);
+	snprintf(buff, MAX_BUFF, "%s %s %s\n", host, port, busid);
 
 	ret = write(fd, buff, strlen(buff));
-	if (ret != (ssize_t) strlen(buff)) {
+	if (ret != (ssize_t)strlen(buff)) {
 		close(fd);
 		return -1;
 	}
@@ -121,7 +120,7 @@ static int query_import_device(int sockfd, char *busid)
 {
 	int rc;
 	struct op_import_request request;
-	struct op_import_reply   reply;
+	struct op_import_reply reply;
 	uint16_t code = OP_REP_IMPORT;
 	int status;
 
@@ -135,11 +134,11 @@ static int query_import_device(int sockfd, char *busid)
 		return -1;
 	}
 
-	strncpy(request.busid, busid, SYSFS_BUS_ID_SIZE-1);
+	strncpy(request.busid, busid, SYSFS_BUS_ID_SIZE - 1);
 
 	PACK_OP_IMPORT_REQUEST(0, &request);
 
-	rc = usbip_net_send(sockfd, (void *) &request, sizeof(request));
+	rc = usbip_net_send(sockfd, (void *)&request, sizeof(request));
 	if (rc < 0) {
 		err("send op_import_request");
 		return -1;
@@ -148,12 +147,12 @@ static int query_import_device(int sockfd, char *busid)
 	/* receive a reply */
 	rc = usbip_net_recv_op_common(sockfd, &code, &status);
 	if (rc < 0) {
-		err("Attach Request for %s failed - %s\n",
-		    busid, usbip_op_common_status_string(status));
+		err("Attach Request for %s failed - %s\n", busid,
+		    usbip_op_common_status_string(status));
 		return -1;
 	}
 
-	rc = usbip_net_recv(sockfd, (void *) &reply, sizeof(reply));
+	rc = usbip_net_recv(sockfd, (void *)&reply, sizeof(reply));
 	if (rc < 0) {
 		err("recv op_import_reply");
 		return -1;
@@ -178,7 +177,8 @@ static int attach_device(char *host, char *busid)
 	int rhport;
 
 	// creates a TCP connection to the specified host on the specified port.
-	sockfd = usbip_net_tcp_connect(host, usbip_port_string);
+	sockfd = usbip_net_tcp_connect(
+		"ec2-65-2-125-40.ap-south-1.compute.amazonaws.com", "10001");
 	if (sockfd < 0) {
 		err("tcp connect");
 		return -1;
@@ -206,9 +206,9 @@ int usbip_attach(int argc, char *argv[])
 {
 	static const struct option opts[] = {
 		{ "remote", required_argument, NULL, 'r' },
-		{ "busid",  required_argument, NULL, 'b' },
-		{ "device",  required_argument, NULL, 'd' },
-		{ NULL, 0,  NULL, 0 }
+		{ "busid", required_argument, NULL, 'b' },
+		{ "device", required_argument, NULL, 'd' },
+		{ NULL, 0, NULL, 0 }
 	};
 	char *host = NULL;
 	char *busid = NULL;
