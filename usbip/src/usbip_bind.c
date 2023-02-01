@@ -135,6 +135,9 @@ static int bind_device(char *busid)
 	struct udev_device *dev;
 	const char *devpath;
 
+	int status = ST_OK;
+	struct usbip_usb_device pdu_udev;
+
 	/* Check whether the device with this bus ID exists. */
 	udev = udev_new();
 	dev = udev_device_new_from_subsystem_sysname(udev, "usb", busid);
@@ -206,6 +209,29 @@ static int bind_device(char *busid)
 	if (found) {
 		usbip_net_set_nodelay(sockfd);
 		usbip_export_device(edev, sockfd);
+	} else {
+		status = ST_NODEV;
+	}
+
+
+	rc = usbip_net_send_op_common(sockfd, OP_REP_IMPORT, status);
+	if (rc < 0) {
+		dbg("usbip_net_send_op_common failed: %#0x", OP_REP_IMPORT);
+		return -1;
+	}
+
+	if (status) {
+		//		dbg("import request busid %s: failed", req.busid);
+		return -1;
+	}
+
+	memcpy(&pdu_udev, &edev->udev, sizeof(pdu_udev));
+	usbip_net_pack_usb_device(1, &pdu_udev);
+
+	rc = usbip_net_send(sockfd, &pdu_udev, sizeof(pdu_udev));
+	if (rc < 0) {
+		dbg("usbip_net_send failed: devinfo");
+		return -1;
 	}
 
 	while (1) {
