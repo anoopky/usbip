@@ -217,7 +217,6 @@ static int bind_device(char *busid)
 		status = ST_NODEV;
 	}
 
-
 	rc = usbip_net_send_op_common(sockfd, OP_REP_IMPORT, status);
 	if (rc < 0) {
 		dbg("usbip_net_send_op_common failed: %#0x", OP_REP_IMPORT);
@@ -238,6 +237,7 @@ static int bind_device(char *busid)
 		return -1;
 	}
 
+	// need to close the usbip_driver_open(driver)
 	while (1) {
 	}
 	// send some packet such that router knows about this device
