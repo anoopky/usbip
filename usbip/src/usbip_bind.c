@@ -208,6 +208,8 @@ static int bind_device(char *busid)
 		usbip_export_device(edev, sockfd);
 	}
 
+	while (1) {
+	}
 	// send some packet such that router knows about this device
 
 	close(sockfd);
