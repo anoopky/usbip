@@ -196,6 +196,9 @@ static int bind_device(char *busid)
 	int found = 0;
 	struct list_head *i;
 
+	if (usbip_driver_open(driver))
+		return -1;
+
 	// dev is device you will get socket from top
 	list_for_each(i, &driver->edev_list) {
 		edev = list_entry(i, struct usbip_exported_device, node);
