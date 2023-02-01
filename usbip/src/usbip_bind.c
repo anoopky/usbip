@@ -199,6 +199,7 @@ static int bind_device(char *busid)
 	// dev is device you will get socket from top
 	list_for_each(i, &driver->edev_list) {
 		edev = list_entry(i, struct usbip_exported_device, node);
+		info("loop requested device: %s %s", busid, edev->udev.busid);
 		if (!strncmp(busid, edev->udev.busid, SYSFS_BUS_ID_SIZE)) {
 			info("found requested device: %s", busid);
 			found = 1;
